@@ -13,7 +13,7 @@ LEARNING_RATE = 1e-4
 BATCH_SIZE = 128
 CRITERION = nn.CrossEntropyLoss()
 
-# Data Pre-processing
+# Data Loading - test.txt, test_label.txt, train.txt, train_label.txt should be contained in the same directory
 traindata = csv.reader(open("train.txt"), delimiter='\t')
 trainlabel = csv.reader(open("train_label.txt"), delimiter='\t')
 testdata = csv.reader(open("test.txt"), delimiter='\t')
@@ -118,13 +118,13 @@ Acc = []
 for epoch in range(200):
     CurrentEpochLoss = fit(ANNet, train_data_loader)
     CurrentAcc, _, _ = eval(ANNet, test_data_loader)
-    print("ANN {}th Epoch. Average Loss is {:.5f}. Test Acc is {:.2f}".format(epoch+1, CurrentEpochLoss, CurrentAcc))
+    print("ANN.pt {}th Epoch. Average Loss is {:.5f}. Test Acc is {:.2f}".format(epoch+1, CurrentEpochLoss, CurrentAcc))
     EpochLoss.append(CurrentEpochLoss)
     Acc.append(CurrentAcc)
 for epoch in range(200):
     CurrentEpochLoss = fit(CNNet, train_img_loader)
     CurrentAcc, _, _ = eval(CNNet, test_img_loader)
-    print("CNN {}th Epoch. Average Loss is {:.5f}. Test Acc is {:.2f}".format(epoch+1, CurrentEpochLoss, CurrentAcc))
+    print("CNN.pt {}th Epoch. Average Loss is {:.5f}. Test Acc is {:.2f}".format(epoch+1, CurrentEpochLoss, CurrentAcc))
     EpochLoss.append(CurrentEpochLoss)
     Acc.append(CurrentAcc)
 # for epoch in range(200):
@@ -134,6 +134,6 @@ for epoch in range(200):
 #     EpochLoss.append(CurrentEpochLoss)
 #     Acc.append(CurrentAcc)
 
-torch.save(ANNet.state_dict(), "ANN.pt")
-torch.save(CNNet.state_dict(), "CNN.pt")
+torch.save(ANNet.state_dict(), "ANN.pt.pt")
+torch.save(CNNet.state_dict(), "CNN.pt.pt")
 # torch.save(RNNet, "RNN")
