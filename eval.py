@@ -1,7 +1,9 @@
-import csv, torch
-from torch.utils.data import Dataset, DataLoader
+import csv
+import torch
+
 import numpy as np
 import torch.nn as nn
+from torch.utils.data import DataLoader
 
 testdata = csv.reader(open("test.txt"), delimiter='\t')
 testlabel = csv.reader(open("test_label.txt"), delimiter='\t')
@@ -14,6 +16,7 @@ for line in testlabel:
 
 for line in testdata:
     test_data.append([float(i) for i in line[0:-1]])
+
 
 def eval(model, test_loader):
     model.eval()
@@ -34,6 +37,7 @@ def eval(model, test_loader):
     pred_labels = pred_labels.argmax(axis=1)
     acc = sum(real_labels == pred_labels) / len(real_labels) * 100
     return acc, pred_labels, real_labels
+
 
 ##
 LEARNING_RATE = 1e-4
@@ -59,16 +63,18 @@ test_img_loader = DataLoader(dataset=test_imgset, batch_size=BATCH_SIZE, shuffle
 ANNet = torch.load("./ANN")
 CNNet = torch.load("./CNN")
 
-Acc, pred_labels_ann, real_labels = eval(ANNet, test_data_loader)
-Acc, pred_labels_cnn, real_labels = eval(CNNet, test_img_loader)
+Acc1, pred_labels_ann, real_labels1 = eval(ANNet, test_data_loader)
+Acc2, pred_labels_cnn, real_labels2 = eval(CNNet, test_img_loader)
 
 f1 = open("pred_labels_ann.txt", "w", encoding='ascii', newline='')
 f2 = open("pred_labels_cnn.txt", "w", encoding='ascii', newline='')
 wr1 = csv.writer(f1)
 wr2 = csv.writer(f2)
-for l in pred_labels_ann:
-   wr1.writerow([l, ''])
+
+for param in pred_labels_ann:
+    wr1.writerow([param, ''])
 f1.close()
-for l in pred_labels_cnn:
-   wr2.writerow([l, ''])
+
+for param in pred_labels_cnn:
+    wr2.writerow([param, ''])
 f2.close()
