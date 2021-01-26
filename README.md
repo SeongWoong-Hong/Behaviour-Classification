@@ -1,4 +1,4 @@
-#Behaviour Classification
+# Behaviour Classification
 
 This repository is the projectory for classification task for the SportsTracker project. This project aims to classifying human behaviour recognition while human do golf activity.
 
@@ -12,7 +12,7 @@ It didn't tested yet in the large size of dataset.
 
 ***
 
-###Data Requirement
+### Data Requirement
 
 In the data folder, it should contain the experimental data for running the preprocessing.m
 
@@ -22,7 +22,7 @@ In the data folder, it should contain the experimental data for running the prep
 
 ***
 
-###Running
+### Running
 
 When all data requirements are satisfied
 1. run prprocessing.m
