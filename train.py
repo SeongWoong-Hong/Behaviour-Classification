@@ -1,4 +1,4 @@
-## Header
+# Header
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
@@ -8,8 +8,12 @@ import csv
 import numpy as np
 
 
-## Data Preprocessing
+# hyper parameters for learning
+LEARNING_RATE = 1e-4
+BATCH_SIZE = 128
+CRITERION = nn.CrossEntropyLoss()
 
+# Data Pre-processing
 traindata = csv.reader(open("train.txt"), delimiter='\t')
 trainlabel = csv.reader(open("train_label.txt"), delimiter='\t')
 testdata = csv.reader(open("test.txt"), delimiter='\t')
@@ -32,12 +36,7 @@ for line in testlabel:
 for line in testdata:
     test_data.append([float(i) for i in line[0:-1]])
 
-##
-LEARNING_RATE = 1e-4
-BATCH_SIZE = 128
-CRITERION = nn.CrossEntropyLoss()
-
-##
+# Set the train, test dataset
 train_data = np.array(train_data, dtype=np.float32)
 train_image = train_data.reshape([len(train_label), 1, -1, 6])
 img_size = train_image.shape[1]*train_image.shape[2]*train_image.shape[3]
@@ -62,13 +61,17 @@ tensor_label_data = torch.from_numpy(label_data)
 test_dataset = list(zip(tensor_test_data, tensor_label_data))
 test_imgset = list(zip(tensor_test_image, tensor_label_data))
 
+train_data_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+train_img_loader = DataLoader(dataset=train_imgset, batch_size=BATCH_SIZE, shuffle=True)
+test_data_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+test_img_loader = DataLoader(dataset=test_imgset, batch_size=BATCH_SIZE, shuffle=False)
 
-##
+
+# Define fit and eval function for learning
 def fit(model, train_loader):
     model.train()
     device = next(model.parameters()).device.index
     optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
-    # optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     losses = []
     for i, data in enumerate(train_loader):
         image = data[0].type(torch.FloatTensor).cuda(device)
@@ -84,7 +87,7 @@ def fit(model, train_loader):
     avg_loss = sum(losses)/len(losses)
     return avg_loss
 
-##
+
 def eval(model, test_loader):
     model.eval()
     device = next(model.parameters()).device.index
@@ -105,14 +108,11 @@ def eval(model, test_loader):
     acc = sum(real_labels == pred_labels) / len(real_labels) * 100
     return acc, pred_labels, real_labels
 
-train_data_loader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-train_img_loader = DataLoader(dataset=train_imgset, batch_size=BATCH_SIZE, shuffle=True)
-test_data_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-test_img_loader = DataLoader(dataset=test_imgset, batch_size=BATCH_SIZE, shuffle=False)
 
+# learning process
 ANNet = ANNModel(inp, 4).cuda()
 CNNet = CNNModel(img_size, 4).cuda()
-# RNNet = RNNModel(inp, 128, 4).cuda()
+# RNNet = RNNModel(inp, 128, 4).cuda()  # Not Implemented yet
 EpochLoss = []
 Acc = []
 for epoch in range(200):
@@ -137,13 +137,3 @@ for epoch in range(200):
 torch.save(ANNet.state_dict(), "ANN.pt")
 torch.save(CNNet.state_dict(), "CNN.pt")
 # torch.save(RNNet, "RNN")
-##
-
-
-# Acc, pred_labels, real_labels = eval(ANNet, test_loader)
-# plt.plot(real_labels)
-# plt.show()
-# plt.plot(pred_labels)
-# plt.show()
-# print("{}, {:.2f}".format(len(real_labels), Acc))
-
