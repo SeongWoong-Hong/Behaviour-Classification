@@ -13,9 +13,9 @@ using the ANN and CNN structure.
 It didn't tested yet in the large size of dataset.
 
 
-####Data Requirement
+###Data Requirement
 
-***
+---
 
 In the *data* folder, it should contain the experimental data for running the preprocessing.m
 
@@ -25,9 +25,9 @@ In the *data* folder, it should contain the experimental data for running the pr
 - `(subjct)/traial(#).csv` files
 
 
-####Running
+###Running
 
-***
+---
 
 When all data requirements are satisfied
 
