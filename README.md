@@ -5,7 +5,7 @@ This project aims to classifying human behaviour recognition while human do golf
 Now, it can classify 
 
 - walking
-- stay alone
+- stand alone
 - golf swing
 
 using the ANN and CNN structure.
