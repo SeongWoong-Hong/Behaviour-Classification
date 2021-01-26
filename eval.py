@@ -60,8 +60,8 @@ test_imgset = list(zip(tensor_test_image, tensor_label_data))
 test_data_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 test_img_loader = DataLoader(dataset=test_imgset, batch_size=BATCH_SIZE, shuffle=False)
 
-ANNet = torch.load("./ANN")
-CNNet = torch.load("./CNN")
+ANNet = torch.load("./ANN.pt")
+CNNet = torch.load("./CNN.pt")
 
 Acc1, pred_labels_ann, real_labels1 = eval(ANNet, test_data_loader)
 Acc2, pred_labels_cnn, real_labels2 = eval(CNNet, test_img_loader)
