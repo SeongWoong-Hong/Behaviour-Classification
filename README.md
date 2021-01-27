@@ -17,7 +17,7 @@ It didn't tested yet in the large size of dataset.
 In the data folder, it should contain the experimental data for running the preprocessing.m
 
 - `(subject)_trial(#)_label.txt` files
-    - In current data folder, (subject)_trial(#).m files save hand-labeling data of the experiment as txt form.
+    - In current data folder, `(subject)_trial(#).m` files save hand-labeling data of the experiment as txt form.
 - `(subjct)/traial(#).csv` files
 
 
