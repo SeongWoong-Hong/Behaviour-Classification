@@ -17,32 +17,8 @@ for line in testlabel:
 for line in testdata:
     test_data.append([float(i) for i in line[0:-1]])
 
-
-def eval(model, test_loader):
-    model.eval()
-    device = next(model.parameters()).device.index
-    pred_labels = []
-    real_labels = []
-    for i, data in enumerate(test_loader):
-        image = data[0].type(torch.FloatTensor).cuda(device)
-        label = data[1].type(torch.LongTensor).cuda(device)
-        real_labels += list(label.cpu().detach().numpy())
-
-        pred_label = model(image)
-        pred_label = list(pred_label.cpu().detach().numpy())
-        pred_labels += pred_label
-
-    real_labels = np.array(real_labels)
-    pred_labels = np.array(pred_labels)
-    pred_labels = pred_labels.argmax(axis=1)
-    acc = sum(real_labels == pred_labels) / len(real_labels) * 100
-    return acc, pred_labels, real_labels
-
-
 ##
-LEARNING_RATE = 1e-4
 BATCH_SIZE = 128
-CRITERION = nn.CrossEntropyLoss()
 
 ##
 test_data = np.array(test_data, dtype=np.float32)
@@ -63,8 +39,8 @@ test_img_loader = DataLoader(dataset=test_imgset, batch_size=BATCH_SIZE, shuffle
 ANNet = torch.load("./ANN.pt")
 CNNet = torch.load("./CNN.pt")
 
-Acc1, pred_labels_ann, real_labels1 = eval(ANNet, test_data_loader)
-Acc2, pred_labels_cnn, real_labels2 = eval(CNNet, test_img_loader)
+Acc1, pred_labels_ann, real_labels1 = ANNet.test(test_data_loader)
+Acc2, pred_labels_cnn, real_labels2 = CNNet.test(test_img_loader)
 
 f1 = open("pred_labels_ann.txt", "w", encoding='ascii', newline='')
 f2 = open("pred_labels_cnn.txt", "w", encoding='ascii', newline='')
