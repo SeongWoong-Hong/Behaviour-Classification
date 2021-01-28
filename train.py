@@ -1,17 +1,16 @@
 # Header
+import csv
 import torch
 import torch.nn as nn
+import numpy as np
+
 from torch.utils.data import Dataset, DataLoader
 from Models import ANNModel, CNNModel, RNNModel
 from matplotlib import pyplot as plt
-import csv
-import numpy as np
 
 
 # hyper parameters for learning
-LEARNING_RATE = 1e-4
 BATCH_SIZE = 128
-CRITERION = nn.CrossEntropyLoss()
 
 # Data Loading - test.txt, test_label.txt, train.txt, train_label.txt should be contained in the same directory
 traindata = csv.reader(open("train.txt"), delimiter='\t')
@@ -67,73 +66,24 @@ test_data_loader = DataLoader(dataset=test_dataset, batch_size=BATCH_SIZE, shuff
 test_img_loader = DataLoader(dataset=test_imgset, batch_size=BATCH_SIZE, shuffle=False)
 
 
-# Define fit and eval function for learning
-def fit(model, train_loader):
-    model.train()
-    device = next(model.parameters()).device.index
-    optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
-    losses = []
-    for i, data in enumerate(train_loader):
-        image = data[0].type(torch.FloatTensor).cuda(device)
-        label = data[1].type(torch.LongTensor).cuda(device)
-
-        pred_label = model(image)
-        loss = CRITERION(pred_label, label)
-        losses.append(loss.item())
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-    avg_loss = sum(losses)/len(losses)
-    return avg_loss
-
-
-def eval(model, test_loader):
-    model.eval()
-    device = next(model.parameters()).device.index
-    pred_labels = []
-    real_labels = []
-    for i, data in enumerate(test_loader):
-        image = data[0].type(torch.FloatTensor).cuda(device)
-        label = data[1].type(torch.LongTensor).cuda(device)
-        real_labels += list(label.cpu().detach().numpy())
-
-        pred_label = model(image)
-        pred_label = list(pred_label.cpu().detach().numpy())
-        pred_labels += pred_label
-
-    real_labels = np.array(real_labels)
-    pred_labels = np.array(pred_labels)
-    pred_labels = pred_labels.argmax(axis=1)
-    acc = sum(real_labels == pred_labels) / len(real_labels) * 100
-    return acc, pred_labels, real_labels
-
-
 # learning process
-ANNet = ANNModel(inp, 4).cuda()
-CNNet = CNNModel(img_size, 4).cuda()
+ANNet = ANNModel(inp, 4, optim=torch.optim.SGD).cuda()
+CNNet = CNNModel(img_size, 4, 4, optim=torch.optim.SGD).cuda()
 # RNNet = RNNModel(inp, 128, 4).cuda()  # Not Implemented yet
 EpochLoss = []
 Acc = []
 for epoch in range(200):
-    CurrentEpochLoss = fit(ANNet, train_data_loader)
-    CurrentAcc, _, _ = eval(ANNet, test_data_loader)
+    CurrentEpochLoss = ANNet.fit(train_data_loader)
+    CurrentAcc, _, _ = ANNet.test(test_data_loader)
     print("ANN.pt {}th Epoch. Average Loss is {:.5f}. Test Acc is {:.2f}".format(epoch+1, CurrentEpochLoss, CurrentAcc))
     EpochLoss.append(CurrentEpochLoss)
     Acc.append(CurrentAcc)
 for epoch in range(200):
-    CurrentEpochLoss = fit(CNNet, train_img_loader)
-    CurrentAcc, _, _ = eval(CNNet, test_img_loader)
+    CurrentEpochLoss = CNNet.fit(train_img_loader)
+    CurrentAcc, _, _ = CNNet.test(test_img_loader)
     print("CNN.pt {}th Epoch. Average Loss is {:.5f}. Test Acc is {:.2f}".format(epoch+1, CurrentEpochLoss, CurrentAcc))
     EpochLoss.append(CurrentEpochLoss)
     Acc.append(CurrentAcc)
-# for epoch in range(200):
-#     CurrentEpochLoss = fit(RNNet, train_loader)
-#     CurrentAcc, _, _ = eval(RNNet, test_loader)
-#     print("RNN {}th Epoch. Average Loss is {:.5f}. Test Acc is {:.2f}".format(epoch+1, CurrentEpochLoss, CurrentAcc))
-#     EpochLoss.append(CurrentEpochLoss)
-#     Acc.append(CurrentAcc)
 
-torch.save(ANNet.state_dict(), "ANN.pt.pt")
-torch.save(CNNet.state_dict(), "CNN.pt.pt")
-# torch.save(RNNet, "RNN")
+torch.save(ANNet.state_dict(), "ANN.pt")
+torch.save(CNNet.state_dict(), "CNN.pt")
