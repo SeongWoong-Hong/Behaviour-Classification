@@ -1,13 +1,17 @@
 clear, clc, close all
 %%
-data1 = readmatrix(["./data/S2/trial1.csv"]); label1 = load("S2_trial1_label.txt");
-data2 = readmatrix(["./data/S2/trial2.csv"]); label2 = load("S2_trial2_label.txt");
-data3 = readmatrix(["./data/S1/trial1.csv"]); label3 = load("S1_trial1_label.txt");
-data4 = readmatrix(["./data/S1/trial2.csv"]); label4 = load("S1_trial2_label.txt");
+data1 = readmatrix("./data/S1/trial1.csv"); label1 = load("S1_trial1_label.txt");
+data2 = readmatrix("./data/S1/trial2.csv"); label2 = load("S1_trial2_label.txt");
+data3 = readmatrix("./data/S2/trial1.csv"); label3 = load("S2_trial1_label.txt");
+data4 = readmatrix("./data/S2/trial2.csv"); label4 = load("S2_trial2_label.txt");
+data5 = readmatrix("./data/S3/trial1.csv"); label5 = load("S3_trial1_label.txt");
+data6 = readmatrix("./data/S3/trial2.csv"); label6 = load("S3_trial2_label.txt");
 
 X1 = data1(:,14:19)./max(abs(data1(:,14:19)));
 X2 = data3(:,14:19)./max(abs(data3(:,14:19)));
 X3 = data4(:,14:19)./max(abs(data4(:,14:19)));
+X4 = data5(:,14:19)./max(abs(data5(:,14:19)));
+X5 = data6(:,14:19)./max(abs(data6(:,14:19)));
 
 Test = data2(:,14:19)./max(abs(data2(:,14:19)));
 
