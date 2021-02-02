@@ -26,10 +26,12 @@ In the data folder, it should contain the experimental data for running the prep
 
 
 When all data requirements are satisfied
-1. run prprocessing.m
+1. run `prprocessing.m`
     - creates test.txt, train.txt, test_label.txt, train_label.txt
-2. run train.py
+2. run `train.py`
     - Learning neural net model using train dataset
     - creates ANN.pt, CNN.pt
-3. run eval.py
+3. run `eval.py`
     - Evaluate classification model using test dataset
+4. run `compare_result.m`
+    - Calculate the accuracy of prediction by models and draw scatter plots
