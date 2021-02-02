@@ -1,11 +1,11 @@
 clear, clc, close all
 %%
-data1 = readmatrix("./data/S1/trial1.csv"); label1 = load("S1_trial1_label.txt");
-data2 = readmatrix("./data/S1/trial2.csv"); label2 = load("S1_trial2_label.txt");
-data3 = readmatrix("./data/S2/trial1.csv"); label3 = load("S2_trial1_label.txt");
-data4 = readmatrix("./data/S2/trial2.csv"); label4 = load("S2_trial2_label.txt");
-data5 = readmatrix("./data/S3/trial1.csv"); label5 = load("S3_trial1_label.txt");
-data6 = readmatrix("./data/S3/trial2.csv"); label6 = load("S3_trial2_label.txt");
+data1 = readmatrix("./data/S1/trial1.csv"); label1 = load("./data/S1_trial1_label.txt");
+data2 = readmatrix("./data/S1/trial2.csv"); label2 = load("./data/S1_trial2_label.txt");
+data3 = readmatrix("./data/S2/trial1.csv"); label3 = load("./data/S2_trial1_label.txt");
+data4 = readmatrix("./data/S2/trial2.csv"); label4 = load("./data/S2_trial2_label.txt");
+data5 = readmatrix("./data/S3/trial1.csv"); label5 = load("./data/S3_trial1_label.txt");
+data6 = readmatrix("./data/S3/trial2.csv"); label6 = load("./data/S3_trial2_label.txt");
 
 X1 = data1(:,14:19)./max(abs(data1(:,14:19)));
 X2 = data3(:,14:19)./max(abs(data3(:,14:19)));
@@ -13,38 +13,26 @@ X3 = data4(:,14:19)./max(abs(data4(:,14:19)));
 X4 = data5(:,14:19)./max(abs(data5(:,14:19)));
 X5 = data6(:,14:19)./max(abs(data6(:,14:19)));
 
+Train = {X1, X2, X3, X4, X5};
+labels = {label1, label3, label4, label5, label6};
 Test = data2(:,14:19)./max(abs(data2(:,14:19)));
 
 n = 100;
 %% Train
-l1 = length(X1);
-l2 = length(X2);
-l3 = length(X3);
-X1window = zeros(l1-2*n,6*(n+1));
-X2window = zeros(l2-2*n,6*(n+1));
-X3window = zeros(l3-2*n,6*(n+1));
-
-for i = n+1:l1-n
-    for j = i-n:i+n
-        X1window(i-n,6*(j-i+n)+1:6*(j-i+n+1)) = X1(j,:);
+Trainwindow = []; TrainLabelwindow = [];
+for k = 1:3
+    X = Train{k}; label = labels{k};
+    l = length(X);
+    Xwindow = zeros(l-2*n, 6*(n+1));
+    for i = n+1:l-n
+        for j = i-n:i+n
+            Xwindow(i-n,6*(j-i+n)+1:6*(j-i+n+1)) = X(j,:);
+        end
     end
+    Lwindow = label(n+1:l-n);
+    Trainwindow = [Trainwindow; Xwindow];
+    TrainLabelwindow = [TrainLabelwindow; Lwindow];
 end
-for i = n+1:l2-n
-    for j = i-n:i+n
-        X2window(i-n,6*(j-i+n)+1:6*(j-i+n+1)) = X2(j,:);
-    end
-end
-for i = n+1:l3-n
-    for j = i-n:i+n
-        X3window(i-n,6*(j-i+n)+1:6*(j-i+n+1)) = X3(j,:);
-    end
-end
-L1window = label1(n+1:l1-n);
-L2window = label3(n+1:l2-n);
-L3window = label4(n+1:l3-n);
-
-Trainwindow = [X1window; X2window; X3window];
-TrainLabelwindow = [L1window; L2window; L3window];
 
 save train.txt Trainwindow -ascii -tabs -double
 save train_label.txt TrainLabelwindow -ascii -tabs -double
