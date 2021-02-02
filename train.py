@@ -5,7 +5,6 @@ import numpy as np
 
 from torch.utils.data import DataLoader
 from Models import ANNModel, CNNModel, RNNModel
-from matplotlib import pyplot as plt
 
 
 # hyper parameters for learning
@@ -66,42 +65,12 @@ val_img_loader = DataLoader(dataset=val_imgset, batch_size=len(val_imgset), shuf
 
 
 # learning process
-ANNet = ANNModel(inp, 4, optim=torch.optim.Adam).cuda()
+ANNet = ANNModel(inp, 4, optim=torch.optim.SGD).cuda()
 CNNet = CNNModel(img_size, 4, 4, optim=torch.optim.Adam).cuda()
 # RNNet = RNNModel(inp, 128, 4).cuda()  # Not Implemented yet
-EpochLoss = []
-Acc = []
-for epoch in range(500):
-    CurrentEpochLoss = ANNet.fit(train_data_loader)
-    CurrentAcc, _, _ = ANNet.test(val_data_loader)
-    EpochLoss.append(CurrentEpochLoss)
-    Acc.append(CurrentAcc)
-    if (epoch + 1) % 10 == 0:
-        print("ANN model {}th Epoch. Average Loss is {:.5f}. "
-              "Test Acc is {:.2f}".format(epoch + 1, CurrentEpochLoss, CurrentAcc))
 
-plt.plot(Acc)
-plt.xlabel("epoch")
-plt.ylabel("Val. Acc. (%)")
-plt.title("ANN Accuracy")
-plt.show()
-
-EpochLoss = []
-Acc = []
-for epoch in range(300):
-    CurrentEpochLoss = CNNet.fit(train_img_loader)
-    CurrentAcc, _, _ = CNNet.test(val_img_loader)
-    EpochLoss.append(CurrentEpochLoss)
-    Acc.append(CurrentAcc)
-    if (epoch + 1) % 10 == 0:
-        print("CNN model {}th Epoch. Average Loss is {:.5f}. "
-              "Test Acc is {:.2f}".format(epoch + 1, CurrentEpochLoss, CurrentAcc))
-
-plt.plot(Acc)
-plt.xlabel("epoch")
-plt.ylabel("Val. Acc. (%)")
-plt.title("CNN Accuracy")
-plt.show()
-
+ANNet.learn(500, train_data_loader, val_data_loader)
 torch.save(ANNet, "ANN.pt")
+
+CNNet.learn(500, train_img_loader, val_img_loader, early_stop=False)
 torch.save(CNNet, "CNN.pt")
