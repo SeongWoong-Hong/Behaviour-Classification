@@ -7,20 +7,21 @@ data4 = readmatrix("./data/S2/trial2.csv"); label4 = load("./data/S2_trial2_labe
 data5 = readmatrix("./data/S3/trial1.csv"); label5 = load("./data/S3_trial1_label.txt");
 data6 = readmatrix("./data/S3/trial2.csv"); label6 = load("./data/S3_trial2_label.txt");
 
+% 14th to 19th columns are acc and gyro measurements
 X1 = data1(:,14:19)./max(abs(data1(:,14:19)));
 X2 = data3(:,14:19)./max(abs(data3(:,14:19)));
 X3 = data4(:,14:19)./max(abs(data4(:,14:19)));
 X4 = data5(:,14:19)./max(abs(data5(:,14:19)));
-X5 = data6(:,14:19)./max(abs(data6(:,14:19)));
 
-Train = {X1, X2, X3, X4, X5};
+Train = {X1, X2, X3, X4};
 labels = {label1, label3, label4, label5, label6};
+Val = data6(:,14:19)./max(abs(data6(:,14:19)));
 Test = data2(:,14:19)./max(abs(data2(:,14:19)));
 
 n = 100;
 %% Train
 Trainwindow = []; TrainLabelwindow = [];
-for k = 1:3
+for k = 1:4
     X = Train{k}; label = labels{k};
     l = length(X);
     Xwindow = zeros(l-2*n, 6*(n+1));
@@ -36,6 +37,18 @@ end
 
 save train.txt Trainwindow -ascii -tabs -double
 save train_label.txt TrainLabelwindow -ascii -tabs -double
+%% Validation
+l = length(Val);
+Valwindow = zeros(l-2*n, 6*(n+1));
+for i = n+1:l-n
+    for j = i-n:i+n
+        Valwindow(i-n,6*(j-i+n)+1:6*(j-i+n+1)) = Val(j,:);
+    end
+end
+ValLabel = label6(n+1:l-n);
+
+save validation.txt Valwindow -ascii -tabs -double
+save val_label.txt ValLabel -ascii -tabs -double
 %% Test
 l = length(Test);
 Testwindow = zeros(l-2*n, 6*(n+1));
