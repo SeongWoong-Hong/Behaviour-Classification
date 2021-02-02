@@ -93,7 +93,7 @@ class ANNModel(BaseModel):
         self.layer2 = nn.Linear(128, 256)
         self.layer3 = nn.Linear(256, oup)
         self.relu = nn.ReLU(inplace=True)
-        self.optim = optim(self.parameters(), lr=lr, momentum=momentum)
+        self.optim = optim(self.parameters(), lr=lr)
         self.criterion = criterion()
 
     def forward(self, x):
@@ -125,7 +125,7 @@ class CNNModel(BaseModel):
         self.conv3 = nn.Conv2d(16, lst_ch, kernel_size=3, padding=1)
         self.linear = nn.Linear(inp * lst_ch, oup)
         self.relu = nn.ReLU(inplace=True)
-        self.optim = optim(self.parameters(), lr=lr, momentum=momentum)
+        self.optim = optim(self.parameters(), lr=lr)
         self.criterion = criterion()
 
     def forward(self, x):
