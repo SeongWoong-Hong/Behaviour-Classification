@@ -4,6 +4,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from matplotlib import pyplot as plt
+
 
 class BaseModel(nn.Module):
     def fit(self, train_loader):
@@ -44,6 +46,33 @@ class BaseModel(nn.Module):
         acc = sum(real_labels == pred_labels) / len(real_labels) * 100
         return acc, pred_labels, real_labels
 
+    def learn(self, epochs: int, train_loader, val_loader, early_stop: bool = True):
+        EpochLoss = []
+        Acc = []
+        LastAcc, LastLoss = 0, 0
+        for epoch in range(epochs):
+            CurrentEpochLoss = self.fit(train_loader)
+            CurrentAcc, _, _ = self.test(val_loader)
+            EpochLoss.append(CurrentEpochLoss)
+            Acc.append(CurrentAcc)
+            if (epoch + 1) % 20 == 0:
+                print(self.name + " model {}th Epoch. Average Loss is {:.5f}. "
+                      "Test Acc is {:.2f}".format(epoch + 1, CurrentEpochLoss, CurrentAcc))
+                CrAcc = sum(Acc[epoch-19:epoch+1]) / 20
+                CrLoss = sum(EpochLoss[epoch-19:epoch+1]) / 20
+                if early_stop and (CrAcc < LastAcc and CrLoss < LastLoss):
+                    print("Current 20 epochs Acc is {:.2f}, Last 20 epochs Acc is {:.2f}".format(CrAcc, LastAcc))
+                    print("Early Stopping occurs")
+                    break
+                LastAcc = CrAcc
+                LastLoss = CrLoss
+
+        plt.plot(Acc)
+        plt.xlabel("epoch")
+        plt.ylabel("Val. Acc. (%)")
+        plt.title(self.name + " Accuracy")
+        plt.show()
+
 
 class ANNModel(BaseModel):
     def __init__(self,
@@ -59,15 +88,18 @@ class ANNModel(BaseModel):
         :param lr: (float) learning rate
         """
         super(ANNModel, self).__init__()
+        self.name = "ANN"
         self.layer1 = nn.Linear(inp, 128)
-        self.layer2 = nn.Linear(128, oup)
+        self.layer2 = nn.Linear(128, 256)
+        self.layer3 = nn.Linear(256, oup)
         self.relu = nn.ReLU(inplace=True)
         self.optim = optim(self.parameters(), lr=lr, momentum=momentum)
         self.criterion = criterion()
 
     def forward(self, x):
         x = self.relu(self.layer1(x))
-        out = self.relu(self.layer2(x))
+        x = self.relu(self.layer2(x))
+        out = self.relu(self.layer3(x))
         return out
 
 
@@ -87,6 +119,7 @@ class CNNModel(BaseModel):
         :param lr: (float) learning rate
         """
         super(CNNModel, self).__init__()
+        self.name = "CNN"
         self.conv1 = nn.Conv2d(1, 4, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(4, 16, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(16, lst_ch, kernel_size=3, padding=1)
