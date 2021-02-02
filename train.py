@@ -65,12 +65,12 @@ val_img_loader = DataLoader(dataset=val_imgset, batch_size=len(val_imgset), shuf
 
 
 # learning process
-ANNet = ANNModel(inp, 4, optim=torch.optim.SGD).cuda()
+ANNet = ANNModel(inp, 4, optim=torch.optim.Adam).cuda()
 CNNet = CNNModel(img_size, 4, 4, optim=torch.optim.Adam).cuda()
 # RNNet = RNNModel(inp, 128, 4).cuda()  # Not Implemented yet
 
 ANNet.learn(500, train_data_loader, val_data_loader)
 torch.save(ANNet, "ANN.pt")
 
-CNNet.learn(500, train_img_loader, val_img_loader, early_stop=False)
+CNNet.learn(500, train_img_loader, val_img_loader)
 torch.save(CNNet, "CNN.pt")
