@@ -1,9 +1,9 @@
 clc, clear, close all
 %%
-ann_pred_label = load("pred_labels_ann.txt");
-cnn_pred_label = load("pred_labels_cnn.txt");
-test_label = load("test_label.txt");
-test_data = load("test.txt");
+ann_pred_label = load("pred_labels_ann.mat").pred_labels_ann;
+cnn_pred_label = load("pred_labels_cnn.mat").pred_labels_cnn;
+test_label = int64(load("test.mat").TestLabel)';
+test_data = load("test.mat").Testwindow;
 
 ANN_accuracy = 100*sum(ann_pred_label==test_label)/length(ann_pred_label);
 CNN_accuracy = 100*sum(cnn_pred_label==test_label)/length(cnn_pred_label);
