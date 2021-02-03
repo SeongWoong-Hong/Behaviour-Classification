@@ -1,11 +1,11 @@
 clear, clc, close all
 %%
-data1 = readmatrix("./data/S1/trial1.csv"); label1 = load("./data/S1_trial1_label.txt");
-data2 = readmatrix("./data/S1/trial2.csv"); label2 = load("./data/S1_trial2_label.txt");
-data3 = readmatrix("./data/S2/trial1.csv"); label3 = load("./data/S2_trial1_label.txt");
-data4 = readmatrix("./data/S2/trial2.csv"); label4 = load("./data/S2_trial2_label.txt");
-data5 = readmatrix("./data/S3/trial1.csv"); label5 = load("./data/S3_trial1_label.txt");
-data6 = readmatrix("./data/S3/trial2.csv"); label6 = load("./data/S3_trial2_label.txt");
+data1 = readmatrix("./data/S1/trial1.csv"); label1 = load("./data/S1_trial1_label.mat").S1_trial1;
+data2 = readmatrix("./data/S1/trial2.csv"); label2 = load("./data/S1_trial2_label.mat").S1_trial2;
+data3 = readmatrix("./data/S2/trial1.csv"); label3 = load("./data/S2_trial1_label.mat").S2_trial1;
+data4 = readmatrix("./data/S2/trial2.csv"); label4 = load("./data/S2_trial2_label.mat").S2_trial2;
+data5 = readmatrix("./data/S3/trial1.csv"); label5 = load("./data/S3_trial1_label.mat").S3_trial1;
+data6 = readmatrix("./data/S3/trial2.csv"); label6 = load("./data/S3_trial2_label.mat").S3_trial2;
 
 % 14th to 19th columns are acc and gyro measurements
 X1 = data1(:,14:19)./max(abs(data1(:,14:19)));
@@ -17,6 +17,7 @@ Train = {X1, X2, X3, X4};
 labels = {label1, label3, label4, label5, label6};
 Val = data6(:,14:19)./max(abs(data6(:,14:19)));
 Test = data2(:,14:19)./max(abs(data2(:,14:19)));
+
 
 n = 100;
 %% Train
@@ -35,8 +36,7 @@ for k = 1:4
     TrainLabelwindow = [TrainLabelwindow; Lwindow];
 end
 
-save train.txt Trainwindow -ascii -tabs -double
-save train_label.txt TrainLabelwindow -ascii -tabs -double
+save train.mat Trainwindow TrainLabelwindow
 %% Validation
 l = length(Val);
 Valwindow = zeros(l-2*n, 6*(n+1));
@@ -47,8 +47,7 @@ for i = n+1:l-n
 end
 ValLabel = label6(n+1:l-n);
 
-save validation.txt Valwindow -ascii -tabs -double
-save val_label.txt ValLabel -ascii -tabs -double
+save validation.mat Valwindow ValLabel
 %% Test
 l = length(Test);
 Testwindow = zeros(l-2*n, 6*(n+1));
@@ -59,5 +58,4 @@ for i = n+1:l-n
 end
 TestLabel = label2(n+1:l-n);
 
-save test.txt Testwindow -ascii -tabs -double
-save test_label.txt TestLabel -ascii -tabs -double
+save test.mat Testwindow TestLabel
