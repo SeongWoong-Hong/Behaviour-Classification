@@ -42,7 +42,7 @@ class BaseModel(nn.Module):
 
         real_labels = np.array(real_labels)
         pred_labels = np.array(pred_labels)
-        pred_labels = pred_labels.argmax(axis=1)
+        pred_labels = pred_labels.argmax(axis=1).astype(int)
         acc = sum(real_labels == pred_labels) / len(real_labels) * 100
         return acc, pred_labels, real_labels
 
@@ -55,13 +55,13 @@ class BaseModel(nn.Module):
             CurrentAcc, _, _ = self.test(val_loader)
             EpochLoss.append(CurrentEpochLoss)
             Acc.append(CurrentAcc)
-            if (epoch + 1) % 20 == 0:
+            if (epoch + 1) % 5 == 0:
                 print(self.name + " model {}th Epoch. Average Loss is {:.5f}. "
                       "Test Acc is {:.2f}".format(epoch + 1, CurrentEpochLoss, CurrentAcc))
-                CrAcc = sum(Acc[epoch-19:epoch+1]) / 20
-                CrLoss = sum(EpochLoss[epoch-19:epoch+1]) / 20
+                CrAcc = sum(Acc[epoch-4:epoch+1]) / 5
+                CrLoss = sum(EpochLoss[epoch-4:epoch+1]) / 5
                 if early_stop and (CrAcc < LastAcc and CrLoss < LastLoss):
-                    print("Current 20 epochs Acc is {:.2f}, Last 20 epochs Acc is {:.2f}".format(CrAcc, LastAcc))
+                    print("Current 5 epochs Acc is {:.2f}, Last 5 epochs Acc is {:.2f}".format(CrAcc, LastAcc))
                     print("Early Stopping occurs")
                     break
                 LastAcc = CrAcc
